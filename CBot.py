@@ -1,7 +1,7 @@
 from discord.ext import tasks, commands
 from twitchAPI.twitch import Twitch
 from ReactionRole import ConfigMessageRole
-from TwitchStream import ConfigTwitchStream
+import TwitchStream as ts
 import requests
 import os
 
@@ -26,7 +26,7 @@ class CBot(commands.Bot):
         usersStream["dreeeyyy_"] = \
         {"user" : self.get_user(int(os.getenv("ID_DREY"))), "channel" : self.get_channel(int(os.getenv("CHANNEL_TWITCH_ZWEY"))), "alreadySent" : False, "roleChannel" : "😋"}
 
-        await ConfigTwitchStream(usersStream, emojiDict)
+        await ts.ConfigTwitchStream(usersStream, emojiDict, os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"))
         print("Le bot est prêt.", flush=True)
 
     async def on_reaction_add(self, reaction, user):
