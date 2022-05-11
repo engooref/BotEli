@@ -1,16 +1,8 @@
 from discord.ext import tasks, commands
 from twitchAPI.twitch import Twitch
+from ReactionRole import ConfigMessageRole
 import requests
 import os
-
-##Reaction role
-#Function utils
-def getKeys(dict, index):
-    l = list(dict.keys())
-    if index < len(l):
-        return l[index]
-    else:
-        return None
 
 #Variable
 emojiDict = {"📢" : 972851340181114891, "📚" : 972846976813133875, "🎥" : 972847038263877653, "😋" : 972847039417319485}
@@ -62,7 +54,7 @@ class CBot(commands.Bot):
         self.messageRole = None
 
     async def on_ready(self):
-        await self.ConfigMessageRole()
+        self.messageRole = await ConfigMessageRole(self.get_channel(int(os.getenv("CHANNEL_ROLE"))), emojiDict)
         await self.ConfigTwitchStream()
         print("Le bot est prêt.", flush=True)
 
@@ -82,22 +74,6 @@ class CBot(commands.Bot):
         role = reaction.message.guild.get_role(emojiDict[reaction.emoji])
         await user.remove_roles(role)
         print(f'Retrait du role "{role}" à {user}')
-
-    async def ConfigMessageRole(self):
-        channelRole = self.get_channel(int(os.getenv("CHANNEL_ROLE")))
-
-        contentMessRole = f"Ｎｏｔｉｆｉｃａｔｉｏｎｓ :\n\n{getKeys(emojiDict, 0)} : 𝙸𝚗𝚏𝚘𝚛𝚖𝚊𝚝𝚒𝚘𝚗𝚜 \
-        \n\n{getKeys(emojiDict, 1)} : 𝙰𝚟𝚊𝚗𝚌𝚎𝚖𝚎𝚗𝚝 𝚍𝚞 𝚙𝚛𝚘𝚓𝚎𝚝\n\n{getKeys(emojiDict, 2)} : 𝚃𝚠𝚒𝚝𝚌𝚑\n\n{getKeys(emojiDict, 3)} : 𝚉𝚠𝚎𝚢"
-
-        messagesChannel = await channelRole.history().flatten()
-        
-        for message in messagesChannel:
-            if message.content == contentMessRole:
-                await message.delete()
-
-        self.messageRole = await channelRole.send(contentMessRole)
-        for emoji in emojiDict:
-            await self.messageRole.add_reaction(emoji)
 
     async def ConfigTwitchStream(self):
         usersStream = dict()
