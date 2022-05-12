@@ -25,10 +25,6 @@ class Listeners(commands.Cog, name='Listeners module'):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="Purge")
-    async def purge(self, ctx):
-        await ctx.channel.purge(bulk=False, limit=50000)
-
     @commands.command(name="Message")
     async def message(self, ctx):
         await ctx.channel.send(ctx.message.content)
@@ -52,23 +48,3 @@ class Listeners(commands.Cog, name='Listeners module'):
             embedHelpGeneralCmd.add_field(name=f"{each_commands}", value=helpGeneralCmd[each_commands] + "\n----------------------------------------", inline=False)
 
         await ctx.channel.send(author, embed=embedHelpGeneralCmd)
-
-    # Command to add Twitch usernames to the json.
-    @commands.command(name='addtwitch', help='Adds your Twitch to the live notifs.', pass_context=True)
-    async def add_twitch(ctx, twitch_name):
-        # Opens and reads the json file.
-        with open('streamers.json', 'r') as file:
-            streamers = json.loads(file.read())
-        
-        # Gets the users id that called the command.
-        user_id = ctx.author.id
-        # Assigns their given twitch_name to their discord id and adds it to the streamers.json.
-        streamers[user_id] = twitch_name
-        
-        # Adds the changes we made to the json file.
-        with open('streamers.json', 'w') as file:
-            file.write(json.dumps(streamers))
-        # Tells the user it worked.
-        await ctx.send(f"Added {twitch_name} for {ctx.author} to the notifications list.")
-
-
