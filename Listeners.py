@@ -26,8 +26,8 @@ class Listeners(commands.Cog, name='Listeners module'):
         self.bot = bot
 
     @commands.command(name="Message")
-    async def message(self, ctx):
-        await ctx.channel.send(ctx.message.content)
+    async def message(self, ctx, message : str):
+        await ctx.channel.send(message.content)
         await ctx.message.delete()
         
     @commands.command(pass_context=True)
