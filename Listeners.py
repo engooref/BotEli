@@ -1,10 +1,5 @@
-from ast import For
-from re import S
-from unicodedata import name
 from discord.ext import commands, tasks
 import discord, os
-from time import sleep
-import json
 
 
 def cmd(msg):
@@ -17,9 +12,9 @@ def argImp(msg):
 def warning(msg):
     return f"__{msg}__" 
 
-helpGeneralCmd = {}
+helpGeneralCmd = {cmd("Message") + " " + argImp("mess") : "Permet d'envoyer un message avec le bot"}
 
-authorizedRoles = []
+authorizedRoles = ["Mangaka"]
 
 class Listeners(commands.Cog, name='Listeners module'):
     def __init__(self, bot):
