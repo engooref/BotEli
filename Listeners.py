@@ -29,6 +29,11 @@ class Listeners(commands.Cog, name='Listeners module'):
     async def purge(self, ctx):
         await ctx.channel.purge(bulk=False, limit=50000)
 
+    @commands.command(name="Message")
+    async def message(self, ctx):
+        await ctx.channel.send(ctx.message.content)
+        await ctx.message.delete()
+        
     @commands.command(pass_context=True)
     async def help(self, ctx):
         author = ctx.message.author
