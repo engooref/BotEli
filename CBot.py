@@ -6,7 +6,7 @@ import requests
 import os
 
 #Variable
-emojiDict = {"📢" : 972851340181114891, "📚" : 972846976813133875, "🎥" : 972847038263877653, "😋" : 972847039417319485}
+emojiDict = {"📢" : 972851340181114891, "📚" : 972846976813133875, "🎥" : 972847038263877653, "😋" : 972847039417319485, "🕺" : 977695523563773962}
 
 class CBot(commands.Bot):
     def __init__(self, intents):
@@ -25,6 +25,9 @@ class CBot(commands.Bot):
 
         usersStream["dreeeyyy_"] = \
         {"user" : self.get_user(int(os.getenv("ID_DREY"))), "channel" : self.get_channel(int(os.getenv("CHANNEL_TWITCH_ZWEY"))), "alreadySent" : False, "roleChannel" : "😋"}
+
+        usersStream["lims984"] = \
+        {"user" : self.get_user(int(os.getenv("ID_LIMS"))), "channel" : self.get_channel(int(os.getenv("CHANNEL_TWITCH_LIMS"))), "alreadySent" : False, "roleChannel" : "🕺"}
 
         await ts.ConfigTwitchStream(usersStream, emojiDict, os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"))
         print("Le bot est prêt.", flush=True)
