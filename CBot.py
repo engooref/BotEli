@@ -6,7 +6,7 @@ import requests, os, ReactionRole, Log
 import TwitchStream as ts
 
 #Variable
-emojiDict = {"📢" : 972851340181114891, "📚" : 972846976813133875, "🎥" : 972847038263877653, "😋" : 972847039417319485, "🕺" : 977695523563773962}
+emojiDict = {"📢" : 972851340181114891, "📚" : 972846976813133875, "🎥" : 972847038263877653, "😋" : 972847039417319485, "🕺" : 977695523563773962, "-1" : "None"}
 
 class CBot(commands.Bot):
     def __init__(self, intents):
@@ -31,7 +31,7 @@ class CBot(commands.Bot):
         {"user" : self.get_user(int(os.getenv("ID_LIMS"))), "channel" : self.get_channel(int(os.getenv("CHANNEL_TWITCH_LIMS"))), "alreadySent" : False, "roleChannel" : "🕺"}
 
         usersStream["engooref"] = \
-        {"user" : self.get_user(240511099064025099), "channel" : self.get_channel(918485896691589120), "alreadySent" : False, "roleChannel" : "🕺"}
+        {"user" : self.get_user(int(os.getenv("ID_ENGOOREF"))), "channel" : self.get_channel(int(os.getenv("CHANNEL_TEST"))), "alreadySent" : False, "roleChannel" : "-1"}
 
         await ts.ConfigTwitchStream(usersStream, emojiDict, os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"))
         Log.PrintLog("Le bot est pret.")
