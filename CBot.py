@@ -31,7 +31,7 @@ class CBot(commands.Bot):
         usersStream["lims984"] = \
         {"user" : self.get_user(int(os.getenv("ID_LIMS"))), "channel" : self.get_channel(int(os.getenv("CHANNEL_TWITCH_LIMS"))), "alreadySent" : False, "roleChannel" : "🕺"}
 
-        #await ts.ConfigTwitchStream(usersStream, emojiDict, os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"))
+        await ts.ConfigTwitchStream(usersStream, emojiDict, os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"))
         Log.PrintLog("Le bot est pret.")
 
     async def on_raw_reaction_add(self, payload):
