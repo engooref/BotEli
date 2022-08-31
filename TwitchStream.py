@@ -3,6 +3,7 @@ import requests
 from discord.ext import tasks
 from datetime import datetime
 import Log
+from threading import Thread
 
 TWITCH_STREAM_API_ENDPOINT_V5 = "https://api.twitch.tv/helix/streams?user_login={}"
 
@@ -39,17 +40,26 @@ async def ConfigTwitchStream(usersStream, emojiDict, client_id, client_secret):
             except IndexError:
                 return False
 
-        @tasks.loop(seconds=10)
         async def live_notifs_loop():
-            while 1:
-                for keyStream in usersStream:
-                    userStream = usersStream[keyStream]
+            try:
+                while 1:
+                    for keyStream in usersStream:
+                        userStream = usersStream[keyStream]
 
-                    status = checkuser(keyStream)
-                    if status is True and not userStream["alreadySent"]:
-                        await userStream["channel"].send(f"Hey <@&{emojiDict[userStream['roleChannel']]}>, {keyStream} est en live sur https://twitch.tv/{keyStream} ! Hésite pas à passer une tête !")
-                    userStream["alreadySent"] = status
-                    Log.PrintLog(f'{datetime.now()} - User: {keyStream}, status: {userStream["alreadySent"]}')
-                await asyncio.sleep(10)
+                        status = checkuser(keyStream)
+                        if status is True and not userStream["alreadySent"]:
+                            await userStream["channel"].send(f"Hey <@&{emojiDict[userStream['roleChannel']]}>, {keyStream} est en live sur https://twitch.tv/{keyStream} ! Hésite pas à passer une tête !")
+                        userStream["alreadySent"] = status
+                        Log.PrintLog(f'{datetime.now()} - User: {keyStream}, status: {userStream["alreadySent"]}')
+                    await asyncio.sleep(10)
+            except:
+                pass
 
-        live_notifs_loop.start()
+        def launch_loop():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(live_notifs_loop())
+            loop.close()
+        
+        thread = Thread(target=launch_loop, args=())
+        thread.start()

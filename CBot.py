@@ -1,4 +1,5 @@
 
+from email import message
 from discord.ext import tasks, commands
 from twitchAPI.twitch import Twitch
 import requests, os, ReactionRole, Log
@@ -15,6 +16,7 @@ class CBot(commands.Bot):
     async def on_ready(self):
         Log.PrintLog("\n-------------------------------------------------------\n")
         self.messageRole = await ReactionRole.ConfigMessageRole(self.get_channel(int(os.getenv("CHANNEL_ROLE"))), emojiDict)
+        Log.PrintLog(str(self.messageRole))
         usersStream = dict()
         #Key: Username (User.name) = #Value {class User, class Channel, MessDejaEnvoye} 
         usersStream["eli_shouille"] = \
@@ -29,23 +31,32 @@ class CBot(commands.Bot):
         usersStream["lims984"] = \
         {"user" : self.get_user(int(os.getenv("ID_LIMS"))), "channel" : self.get_channel(int(os.getenv("CHANNEL_TWITCH_LIMS"))), "alreadySent" : False, "roleChannel" : "🕺"}
 
-        await ts.ConfigTwitchStream(usersStream, emojiDict, os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"))
+        #await ts.ConfigTwitchStream(usersStream, emojiDict, os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"))
         Log.PrintLog("Le bot est pret.")
 
-    async def on_reaction_add(self, reaction, user):
-        if user.id == int(os.getenv("ID")) or reaction.message != self.messageRole:
+    async def on_raw_reaction_add(self, payload):
+        channel = self.get_channel(payload.channel_id)
+        user = channel.guild.get_member(payload.user_id)
+        emoji = payload.emoji
+        message = await channel.fetch_message(payload.message_id)
+        if user.id == int(os.getenv("ID")) or message != self.messageRole:
             return
 
-        role = reaction.message.guild.get_role(emojiDict[reaction.emoji])
+        role = message.guild.get_role(emojiDict[str(emoji)])
         await user.add_roles(role)
         Log.PrintLog(f'Ajout du role "{role}" à {user}')
 
 
-    async def on_reaction_remove(self, reaction, user):
-        if user.id == int(os.getenv("ID")) or reaction.message != self.messageRole:
+    async def on_raw_reaction_remove(self, payload):
+        channel = self.get_channel(payload.channel_id)
+        user = channel.guild.get_member(payload.user_id)
+        emoji = payload.emoji
+        message = await channel.fetch_message(payload.message_id)
+
+        if user.id == int(os.getenv("ID")) or message != self.messageRole:
             return
 
-        role = reaction.message.guild.get_role(emojiDict[reaction.emoji])
+        role = message.guild.get_role(emojiDict[str(emoji)])
         await user.remove_roles(role)
         Log.PrintLog(f'Retrait du role "{role}" à {user}')
 
