@@ -1,7 +1,5 @@
 import asyncio
 import requests
-from discord.ext import tasks
-from datetime import datetime
 import Log
 from threading import Thread
 
@@ -23,6 +21,7 @@ async def ConfigTwitchStream(usersStream, emojiDict, client_id, client_secret):
             'Authorization': 'Bearer ' + keys['access_token']
         }
 
+        mainLoop = asyncio.get_event_loop()
 
         def checkuser(user): 
             try: 
@@ -48,18 +47,26 @@ async def ConfigTwitchStream(usersStream, emojiDict, client_id, client_secret):
 
                         status = checkuser(keyStream)
                         if status is True and not userStream["alreadySent"]:
-                            await userStream["channel"].send(f"Hey <@&{emojiDict[userStream['roleChannel']]}>, {keyStream} est en live sur https://twitch.tv/{keyStream} ! Hésite pas à passer une tête !")
+                            str = f"Hey <@&{emojiDict[userStream['roleChannel']]}>, {keyStream} est en live sur https://twitch.tv/{keyStream} ! Hésite pas à passer une tête !"
+                            asyncio.run_coroutine_threadsafe(SendMessage(str, userStream["channel"]), mainLoop)
                         userStream["alreadySent"] = status
-                        Log.PrintLog(f'{datetime.now()} - User: {keyStream}, status: {userStream["alreadySent"]}')
+                        Log.PrintLog(f'User: {keyStream}, status: {userStream["alreadySent"]}')
                     await asyncio.sleep(10)
-            except:
-                pass
+            except Exception as e:
+                Log.PrintLog(str(e))
+
+        async def SendMessage(str, channel):
+            await channel.send(str)
 
         def launch_loop():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(live_notifs_loop())
-            loop.close()
+            while 1:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(live_notifs_loop())
+                loop.close()
+            Log.PrintLog("Thread Twitch Stop")
+
         
+        Log.PrintLog("Thread Twitch Start")
         thread = Thread(target=launch_loop, args=())
         thread.start()

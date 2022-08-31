@@ -1,9 +1,8 @@
-import CBot
-import Listeners
+import CBot, Listeners, Log
 from dotenv import load_dotenv
-from datetime import date
-import discord, os, sys
+import discord, os
 
+Log.Start()
 
 load_dotenv("config")
 

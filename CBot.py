@@ -14,9 +14,8 @@ class CBot(commands.Bot):
         self.messageRole = None
 
     async def on_ready(self):
-        Log.PrintLog("\n-------------------------------------------------------\n")
+        
         self.messageRole = await ReactionRole.ConfigMessageRole(self.get_channel(int(os.getenv("CHANNEL_ROLE"))), emojiDict)
-        Log.PrintLog(str(self.messageRole))
         usersStream = dict()
         #Key: Username (User.name) = #Value {class User, class Channel, MessDejaEnvoye} 
         usersStream["eli_shouille"] = \
@@ -30,6 +29,9 @@ class CBot(commands.Bot):
 
         usersStream["lims984"] = \
         {"user" : self.get_user(int(os.getenv("ID_LIMS"))), "channel" : self.get_channel(int(os.getenv("CHANNEL_TWITCH_LIMS"))), "alreadySent" : False, "roleChannel" : "🕺"}
+
+        usersStream["engooref"] = \
+        {"user" : self.get_user(240511099064025099), "channel" : self.get_channel(918485896691589120), "alreadySent" : False, "roleChannel" : "🕺"}
 
         await ts.ConfigTwitchStream(usersStream, emojiDict, os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"))
         Log.PrintLog("Le bot est pret.")
