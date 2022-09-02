@@ -34,7 +34,7 @@ async def ConfigTwitchStream(usersStream, emojiDict, client_id, client_secret):
                     else: 
                             return False 
                 except Exception as e: 
-                    print("Error checking user: ", e) 
+                    Log.PrintLog("Error checking user: ", e) 
                     return False
             except IndexError:
                 return False
