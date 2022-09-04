@@ -1,10 +1,10 @@
-from datetime import date, datetime
+from datetime import datetime
 from discord.ext import tasks
 import os
 
 dirLog = "./Log"
 nbLogFile = 5
-nameFile = f'{dirLog}/LogEli_{str(date.today())}'
+nameFile = f'{dirLog}/LogEli_{str(datetime.now().date())}'
 
 @tasks.loop(hours=24)
 async def LogFile():
@@ -21,7 +21,11 @@ def Start():
             f.write(f"\n---------------------------------------------------\n\n")   
 
 
-def PrintLog(str):
+def PrintLog(strLog):
+    global nameFile
+    nameFile = f'{dirLog}/LogEli_{str(datetime.now().date())}'
     with open(nameFile, 'a') as f:
-        f.write(f"{datetime.now()} - {str} \n")
+        f.write(f"{datetime.now()} - {strLog} \n")
+
+
 

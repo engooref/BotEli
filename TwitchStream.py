@@ -1,11 +1,16 @@
-import asyncio
-import requests
+import asyncio, requests, threading
 import Log
-from threading import Thread
 
-TWITCH_STREAM_API_ENDPOINT_V5 = "https://api.twitch.tv/helix/streams?user_login={}"
+class Twitch():
+    def __init__(self):
+        self.TWITCH_STREAM_API_ENDPOINT_V5 = "https://api.twitch.tv/helix/streams?user_login={}"
+        self.thread = None
 
-async def ConfigTwitchStream(usersStream, emojiDict, client_id, client_secret):
+    def StopTwitch(self):
+        self.thread.Stop()
+        self.thread.join()
+        
+    async def ConfigTwitchStream(self, usersStream, emojiDict, client_id, client_secret):
 
         body = {
             'client_id': client_id,
@@ -25,7 +30,7 @@ async def ConfigTwitchStream(usersStream, emojiDict, client_id, client_secret):
 
         def checkuser(user): 
             try: 
-                url = TWITCH_STREAM_API_ENDPOINT_V5.format(user) 
+                url = self.TWITCH_STREAM_API_ENDPOINT_V5.format(user) 
                 try: 
                     req = requests.get(url, headers=API_HEADERS) 
                     jsondata = req.json() 
@@ -39,34 +44,43 @@ async def ConfigTwitchStream(usersStream, emojiDict, client_id, client_secret):
             except IndexError:
                 return False
 
-        async def live_notifs_loop():
-            try:
-                while 1:
-                    for keyStream in usersStream:
-                        userStream = usersStream[keyStream]
 
-                        status = checkuser(keyStream)
-                        if status is True and not userStream["alreadySent"]:
-                            str = f"Hey <@&{emojiDict[userStream['roleChannel']]}>, {keyStream} est en live sur https://twitch.tv/{keyStream} ! Hésite pas à passer une tête !"
-                            asyncio.run_coroutine_threadsafe(SendMessage(str, userStream["channel"]), mainLoop)
-                        userStream["alreadySent"] = status
-                        Log.PrintLog(f'User: {keyStream}, status: {userStream["alreadySent"]}')
-                    await asyncio.sleep(10)
-            except Exception as e:
-                Log.PrintLog(str(e))
+        class threadTwitch(threading.Thread):
+            def __init__(self):
+                threading.Thread.__init__(self)
+                self.threadIsOn = True
 
-        async def SendMessage(str, channel):
-            await channel.send(str)
+            def run(self):
+                Log.PrintLog("Thread Twitch Start")
+                while self.threadIsOn:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    loop.run_until_complete(self.live_notifs_loop())
+                    loop.close()
+                Log.PrintLog("Thread Twitch Stop")
 
-        def launch_loop():
-            while 1:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(live_notifs_loop())
-                loop.close()
-            Log.PrintLog("Thread Twitch Stop")
+            async def live_notifs_loop(self):
+                        try:
+                            while self.threadIsOn:
+                                for keyStream in usersStream:
+                                    userStream = usersStream[keyStream]
 
-        
-        Log.PrintLog("Thread Twitch Start")
-        thread = Thread(target=launch_loop, args=())
-        thread.start()
+                                    status = checkuser(keyStream)
+                                    if status is True and not userStream["alreadySent"]:
+                                        str = f"Hey <@&{emojiDict[userStream['roleChannel']]}>, {keyStream} est en live sur https://twitch.tv/{keyStream} ! Hésite pas à passer une tête !"
+                                        asyncio.run_coroutine_threadsafe(self.SendMessage(str, userStream["channel"]), mainLoop)
+                                    userStream["alreadySent"] = status
+                                    Log.PrintLog(f'User: {keyStream}, status: {userStream["alreadySent"]}')
+                                await asyncio.sleep(10)
+                        except Exception as e:
+                            Log.PrintLog(str(e))
+            
+            async def SendMessage(self, str, channel):
+                await channel.send(str)
+
+            def Stop(self):
+                self.threadIsOn = False
+
+        self.thread = threadTwitch()
+        self.thread.start()
+
