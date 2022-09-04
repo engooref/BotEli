@@ -69,8 +69,8 @@ class Twitch():
                                     if status is True and not userStream["alreadySent"]:
                                         str = f"Hey <@&{emojiDict[userStream['roleChannel']]}>, {keyStream} est en live sur https://twitch.tv/{keyStream} ! Hésite pas à passer une tête !"
                                         asyncio.run_coroutine_threadsafe(self.SendMessage(str, userStream["channel"]), mainLoop)
+                                        Log.PrintLog(f'User: {keyStream}, status: {userStream["alreadySent"]}')
                                     userStream["alreadySent"] = status
-                                    Log.PrintLog(f'User: {keyStream}, status: {userStream["alreadySent"]}')
                                 await asyncio.sleep(10)
                         except Exception as e:
                             Log.PrintLog(str(e))
